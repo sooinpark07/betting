@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>배팅 게임</title>
+    <style>
+        body {
+            text-align: center;
+        }
+
+        .option-button {
+            width: 100px;
+            height: 50px;
+            font-size: 20px;
+            margin: 10px;
+        }
+
+        .result-message {
+            font-size: 25px;
+            margin-top: 20px;
+        }
+
+        .round {
+            font-size: 30px;
+            margin-top: 20px;
+        }
+
+        input[type="number"] {
+            width: 150px;
+            height: 50px;
+            font-size: 20px;
+        }
+
+        .resurrection-button {
+            width: 100px;
+            height: 50px;
+            font-size: 20px;
+            margin: 10px auto;
+            display: none;
+        }
+
+        .bankruptcy-message {
+            font-size: 25px;
+            color: red;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>배팅 게임</h1>
+    <p style="font-size: 20px;">보유 금액: $<span id="balance">100</span></p>
+    <p style="font-size: 20px;">배팅 금액: $<input type="number" id="betAmount" min="1"></p>
+    <div id="options">
+        <button class="option-button" id="placeBet1" onclick="placeBet(1)">옵션 1</button>
+        <button class="option-button" id="placeBet2" onclick="placeBet(2)">옵션 2</button>
+        <button class="option-button" id="placeBet3" onclick="placeBet(3)">옵션 3</button>
+        <button class="option-button" id="placeBet4" onclick="placeBet(4)">옵션 4</button>
+    </div>
+    <p class="result-message" id="resultMessage"></p>
+    <p class="round" id="round">라운드: 1</p>
+    <p>최고 기록: <span id="highScore">1</span></p>
+
+    <button class="resurrection-button" id="resurrection" onclick="resurrect()">구원</button>
+    <p class="bankruptcy-message" id="bankruptcyMessage"></p>
+
+    <script>
+        let balance = 100;
+        let round = 1;
+        let successOption;
+        let highScore = 1;
+        let resurrectionShown = false;
+
+        function placeBet(selectedOption) {
+            const betAmount = parseInt(document.getElementById("betAmount").value);
+
+            if (betAmount > 0 && betAmount <= balance) {
+                if (round > 1) {
+                    successOption = Math.floor(Math.random() * 4) + 1;
+                }
+
+                if (selectedOption === successOption) {
+                    balance += betAmount;
+                    document.getElementById("resultMessage").textContent = `축하합니다! $${betAmount}를 벌었습니다.`;
+                } else {
+                    balance -= betAmount;
+                    document.getElementById("resultMessage").textContent = `아쉽지만 $${betAmount}를 잃었습니다.`;
+
+                    if (balance <= 0 && !resurrectionShown) {
+                        document.getElementById("resurrection").style.display = "block";
+                        document.getElementById("bankruptcyMessage").textContent = "파산했습니다! OTL";
+                        document.getElementById("bankruptcyMessage").style.color = "red";
+                        resurrectionShown = true;
+                    } else {
+                        document.getElementById("bankruptcyMessage").textContent = "";
+                    }
+
+                    document.getElementById("balance").textContent = balance;
+                    round++;
+                    document.getElementById("round").textContent = `라운드: ${round}`;
+                    if (round > highScore) {
+                        highScore = round;
+                        document.getElementById("highScore").textContent = highScore;
+                    }
+                }
+            } else {
+                document.getElementById("resultMessage").textContent = "배팅 금액이 유효하지 않습니다.";
+            }
+        }
+
+        function resurrect() {
+            balance += 20;
+            document.getElementById("balance").textContent = balance;
+            document.getElementById("resurrection").style.display = "none";
+            document.getElementById("bankruptcyMessage").textContent = "";
+        }
+    </script>
+</body>
+</html>
